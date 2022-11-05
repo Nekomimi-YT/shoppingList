@@ -22,15 +22,28 @@ require('firebase/firestore');
         firebase.initializeApp(firebaseConfig);
         }
 
-      // reference the specific colletion, shoppinglists
+      // reference the specific collection, shoppinglists
       this.referenceShoppingLists = firebase.firestore().collection('shoppinglists');
       this.state = {
         lists: [],
+        uid: '',
+        loggedInText: '',
       }
     }
 
     componentDidMount() {
       this.unsubscribe = this.referenceShoppingLists.onSnapshot(this.onCollectionUpdate)
+      this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
+        if (!user) {
+          await firebase.auth().signInAnonymously();
+        }
+      
+        //update user state with currently active user data
+        this.setState({
+          uid: user.uid,
+          loggedInText: 'Hello there',
+        });
+      });
     }
     
     componentWillUnmount() {
@@ -54,7 +67,7 @@ require('firebase/firestore');
     };
 
     addList() {
-      this.referenceShoppingLists.add({
+      firebase.firestore().collection('shoppinglists').add({
         name: 'TestList',
         items: ['eggs', 'pasta', 'veggies'],
       });
