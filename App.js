@@ -71,7 +71,7 @@ require('firebase/firestore');
         />
         <Button 
           title="Add an Item"
-          onPress={this.addList()}>
+          onPress={this.addList}>
         </Button>
       <StatusBar style="auto" />
     </View>
