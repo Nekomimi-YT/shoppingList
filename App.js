@@ -48,6 +48,7 @@ require('firebase/firestore');
     
     componentWillUnmount() {
       this.unsubscribe();
+      this.authUnsubscribe();
     }
 
     onCollectionUpdate = (querySnapshot) => {
