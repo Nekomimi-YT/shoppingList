@@ -77,6 +77,7 @@ require('firebase/firestore');
     render () { 
       return (
         <View style={styles.container}>
+        <Text style={styles.text}>{this.state.loggedInText}</Text>
         <Text style={styles.text}>Shopping Lists</Text>
         <FlatList
           data={this.state.lists}
