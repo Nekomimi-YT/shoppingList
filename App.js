@@ -1,3 +1,5 @@
+//Simple shopping list Firestore tutorial using Firebase 7.9.0
+
 import { StatusBar } from 'expo-status-bar';
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, FlatList, Button } from 'react-native';
@@ -24,15 +26,15 @@ require('firebase/firestore');
 
       // reference the specific collection, shoppinglists
       this.referenceShoppingLists = firebase.firestore().collection('shoppinglists');
+      this.referenceShoppinglistUser = null;
       this.state = {
         lists: [],
-        uid: '',
-        loggedInText: '',
+        uid: 0,
+        loggedInText: 'Logging in...please wait',
       }
     }
 
     componentDidMount() {
-      this.unsubscribe = this.referenceShoppingLists.onSnapshot(this.onCollectionUpdate)
       this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
         if (!user) {
           await firebase.auth().signInAnonymously();
@@ -43,11 +45,16 @@ require('firebase/firestore');
           uid: user.uid,
           loggedInText: 'Hello there',
         });
+        // create a reference to the active user's documents (shopping lists)
+        this.referenceShoppinglistUser = firebase.firestore().collection('shoppinglists').where("uid", "==", this.state.uid);
+
+        // listen for collection changes for current user
+        this.unsubscribeListUser = this.referenceShoppinglistUser.onSnapshot(this.onCollectionUpdate);
       });
     }
     
     componentWillUnmount() {
-      this.unsubscribe();
+      this.unsubscribeListUser();
       this.authUnsubscribe();
     }
 
@@ -70,7 +77,8 @@ require('firebase/firestore');
     addList() {
       firebase.firestore().collection('shoppinglists').add({
         name: 'TestList',
-        items: ['eggs', 'pasta', 'veggies'],
+        items: ['drums', 'sticks', 'cymbols'],
+        uid: this.state.uid,
       });
     }    
 
@@ -85,9 +93,12 @@ require('firebase/firestore');
           <Text style={styles.item}>{item.name}: {item.items}</Text>}
         />
         <Button 
-          title="Add an Item"
-          onPress={this.addList}>
-        </Button>
+          onPress={() => {
+            this.addList();
+            //ask question about why plain this.addList doesn work!
+          }}
+          title = "Add an Item"
+        />
       <StatusBar style="auto" />
     </View>
       );
