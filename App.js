@@ -25,7 +25,6 @@ require('firebase/firestore');
         }
 
       // reference the specific collection, shoppinglists
-     // this.referenceShoppingLists = firebase.firestore().collection('shoppinglists');
       this.referenceShoppinglistUser = null;
       this.state = {
         lists: [],
